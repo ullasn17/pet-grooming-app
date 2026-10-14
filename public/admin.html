@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salon Admin Portal - Pawfect Glow</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/auth.js"></script>
+  <style>
+    .admin-navbar {
+      background: #0d281e;
+      color: white;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .admin-badge-pill {
+      background: rgba(226, 183, 85, 0.2);
+      color: #ffd97d;
+      border: 1px solid rgba(226, 183, 85, 0.4);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .admin-layout {
+      padding: 32px 0 60px;
+      min-height: calc(100vh - 140px);
+    }
+    .admin-banner {
+      background: linear-gradient(135deg, #1c3d31 0%, #152d24 100%);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 36px 32px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+    .admin-stat-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .admin-stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--color-border);
+    }
+    .admin-stat-card.pending::before { background: #f59e0b; }
+    .admin-stat-card.confirmed::before { background: #10b981; }
+    .admin-stat-card.rejected::before { background: #ef4444; }
+    .admin-stat-card.revenue::before { background: #6366f1; }
+    .admin-stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .admin-stat-label {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .admin-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .filter-btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .filter-btn.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    .search-box {
+      max-width: 280px;
+      width: 100%;
+    }
+    .admin-card-container {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .action-btn-accept {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .action-btn-accept:hover {
+      background: #047857;
+      transform: translateY(-1px);
+    }
+    .action-btn-reject {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .action-btn-reject:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body id="adminBody" style="display: none;">
+  <!-- Admin Navigation -->
+  <nav class="navbar admin-navbar">
+    <div class="container nav-container">
+      <a href="/admin.html" class="brand-logo" style="color: white;">
+        <div class="logo-icon" style="background: rgba(255,255,255,0.15);">🐾</div>
+        <span>Pawfect<span style="color: #ffd97d;">Glow</span></span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="admin-badge-pill">🛡️ Manager Mode</span>
+        <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); padding: 5px 14px; border-radius: var(--radius-full); font-size: 0.88rem; font-weight: 600;">
+          <span>👤</span>
+          <span id="adminNameDisplay">Sanjay</span>
+        </div>
+        <a href="/dashboard.html" class="btn btn-outline btn-sm" style="color: white; border-color: rgba(255,255,255,0.3);">
+          Client View
+        </a>
+        <button onclick="logout()" class="btn btn-ghost btn-sm" style="color: rgba(255,255,255,0.85);">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="admin-layout">
+    <div class="container">
+
+      <!-- Admin Banner -->
+      <section class="admin-banner">
+        <div>
+          <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; font-weight: 700; display: block; margin-bottom: 6px;">
+            Salon Operations Center
+          </span>
+          <h1 style="color: white; margin-bottom: 8px; font-size: 2rem;">Welcome, Sanjay! 🛡️</h1>
+          <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0; max-width: 620px;">
+            Here are all customer booking requests. Review each appointment, verify details, and <strong>Accept</strong> or <strong>Reject</strong> slots for the salon.
+          </p>
+        </div>
+        <div>
+          <button onclick="loadAdminData()" class="btn btn-accent btn-sm" style="font-weight: 700;">
+            🔄 Refresh Requests
+          </button>
+        </div>
+      </section>
+
+      <!-- Key Metrics Stats Grid -->
+      <section class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statTotalBookings">0</div>
+          <div class="admin-stat-label">Total Bookings</div>
+        </div>
+        <div class="admin-stat-card pending">
+          <div class="admin-stat-num" style="color: #d97706;" id="statPendingCount">0</div>
+          <div class="admin-stat-label">⏳ Pending Review</div>
+        </div>
+        <div class="admin-stat-card confirmed">
+          <div class="admin-stat-num" style="color: #059669;" id="statConfirmedCount">0</div>
+          <div class="admin-stat-label">● Confirmed</div>
+        </div>
+        <div class="admin-stat-card rejected">
+          <div class="admin-stat-num" style="color: #dc2626;" id="statRejectedCount">0</div>
+          <div class="admin-stat-label">✕ Rejected</div>
+        </div>
+        <div class="admin-stat-card revenue">
+          <div class="admin-stat-num" style="color: #4f46e5;" id="statTotalRevenue">$0</div>
+          <div class="admin-stat-label">💰 Paid Revenue</div>
+        </div>
+      </section>
+
+      <!-- Filter Controls -->
+      <section class="admin-controls">
+        <div class="filter-btn-group">
+          <button type="button" class="filter-btn active" onclick="setFilter('all')">All Bookings</button>
+          <button type="button" class="filter-btn" onclick="setFilter('Pending')">⏳ Pending</button>
+          <button type="button" class="filter-btn" onclick="setFilter('Confirmed')">● Confirmed</button>
+          <button type="button" class="filter-btn" onclick="setFilter('Rejected')">✕ Rejected</button>
+          <button type="button" class="filter-btn" onclick="setFilter('Cancelled')">✕ Cancelled</button>
+        </div>
+
+        <div class="search-box">
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="form-input" 
+            placeholder="🔍 Search client, pet, service..." 
+            oninput="handleSearch()"
+            style="padding: 8px 14px; font-size: 0.88rem;"
+          >
+        </div>
+      </section>
+
+      <!-- Appointments Management Table -->
+      <section class="admin-card-container">
+        <div id="appointmentsTableContainer">
+          <!-- Populated dynamically via admin.js -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

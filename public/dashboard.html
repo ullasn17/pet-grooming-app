@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Dashboard - Pawfect Glow Pet Grooming</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- Clerk JavaScript SDK -->
+  <script async crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_c3RpbGwtc3dhbi05NTc0LmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://still-swan-9574.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    type="text/javascript"></script>
+  <script src="/js/auth.js"></script>
+</head>
+
+<body id="dashboardBody" style="display: none;">
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon">🐾</div>
+        <span>Pawfect<span class="accent">Glow</span></span>
+      </a>
+
+      <div class="nav-actions">
+        <a href="/" class="btn btn-ghost btn-sm">Website Home</a>
+        <div
+          style="display: flex; align-items: center; gap: 8px; background: var(--color-surface); border: 1px solid var(--color-border); padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 600;">
+          <div id="clerkUserButton" style="display: inline-flex; align-items: center;"></div>
+          <span id="navUserName">User</span>
+        </div>
+        <button onclick="logout()" class="btn btn-outline btn-sm" id="logoutBtn">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard Content -->
+  <main class="dashboard-layout">
+    <div class="container">
+
+      <!-- Welcome Hero Banner -->
+      <section class="welcome-banner">
+        <div>
+          <span
+            style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; font-weight: 700; display: block; margin-bottom: 6px;">
+            Owner Portal
+          </span>
+          <h1>Welcome back, <span id="welcomeUserName">Pet Parent</span>! 🐾</h1>
+          <p>Treat your beloved pets to a refreshing, stress-free grooming experience.</p>
+        </div>
+
+        <div class="banner-stats">
+          <div class="banner-stat-box">
+            <div class="stat-number" id="statsPetsCount">0</div>
+            <div class="stat-label">Registered Pets</div>
+          </div>
+          <div class="banner-stat-box">
+            <div class="stat-number" id="statsAppointmentsCount">0</div>
+            <div class="stat-label">Active Bookings</div>
+          </div>
+          <div class="banner-stat-box">
+            <div class="stat-number">120</div>
+            <div class="stat-label">Paw Points</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Cards Grid -->
+      <div class="dashboard-grid">
+
+        <!-- Left: My Pets -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-header">
+            <h2><span>🐕</span> My Pets</h2>
+            <button class="btn btn-primary btn-sm" id="openAddPetModalBtn">
+              + Add Pet
+            </button>
+          </div>
+
+          <div id="petsContainer" class="pets-list">
+            <!-- Dynamically populated or empty state -->
+          </div>
+        </div>
+
+        <!-- Right: Book New Appointment -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-header">
+            <h2><span>✨</span> Book Grooming Session</h2>
+          </div>
+
+          <form id="bookAppointmentForm">
+            <div class="form-group">
+              <label class="form-label" for="bookingPetSelect">Select Pet *</label>
+              <select id="bookingPetSelect" class="form-select" required>
+                <option value="" disabled selected>Select one of your pets</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bookingServiceSelect">Grooming Package *</label>
+              <select id="bookingServiceSelect" class="form-select" required>
+                <option value="Royal Full Grooming">Royal Full Grooming - $75 (90 mins)</option>
+                <option value="Signature Bath & Brush" selected>Signature Bath & Brush - $45 (45 mins)</option>
+                <option value="De-Shedding Spa">De-Shedding Spa Treatment - $60 (60 mins)</option>
+                <option value="Puppy & Kitten First Groom">Puppy & Kitten First Groom - $35 (35 mins)</option>
+                <option value="Dental & Breath Refresh">Dental & Breath Refresh - $22 (20 mins)</option>
+                <option value="Nail File & Paw Rescue">Nail File & Paw Rescue - $18 (20 mins)</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="bookingDate">Preferred Date *</label>
+                <input type="date" id="bookingDate" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="bookingTime">Time Slot *</label>
+                <select id="bookingTime" class="form-select" required>
+                  <option value="09:00 AM">09:00 AM - Morning</option>
+                  <option value="11:00 AM" selected>11:00 AM - Midday</option>
+                  <option value="02:00 PM">02:00 PM - Afternoon</option>
+                  <option value="04:30 PM">04:30 PM - Late Afternoon</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bookingNotes">Special Instructions (Optional)</label>
+              <textarea id="bookingNotes" class="form-textarea" rows="2"
+                placeholder="e.g. Sensitive to dryer sound, allergy to lavender oil..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-accent btn-block" id="submitBookingBtn">
+              Schedule Appointment
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Bottom: Appointments History -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h2><span>📅</span> My Appointments</h2>
+          <span style="font-size: 0.85rem; color: var(--color-text-muted);">Real-time booking status</span>
+        </div>
+
+        <div id="appointmentsContainer" class="appointments-table-wrapper">
+          <!-- Dynamically populated appointments table or empty state -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Add Pet Modal -->
+  <div class="modal-backdrop" id="addPetModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size: 1.3rem;">Add New Pet 🐾</h3>
+        <button class="modal-close" id="closeAddPetModalBtn">&times;</button>
+      </div>
+
+      <form id="addPetForm">
+        <div class="form-group">
+          <label class="form-label" for="petName">Pet's Name *</label>
+          <input type="text" id="petName" class="form-input" placeholder="e.g. Milo, Bella" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label" for="petType">Species *</label>
+            <select id="petType" class="form-select" required>
+              <option value="Dog" selected>Dog 🐶</option>
+              <option value="Cat">Cat 🐱</option>
+              <option value="Rabbit">Rabbit 🐰</option>
+              <option value="Other">Other 🐾</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="petBreed">Breed</label>
+            <input type="text" id="petBreed" class="form-input" placeholder="e.g. Golden Retriever">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="petAge">Age</label>
+          <input type="text" id="petAge" class="form-input" placeholder="e.g. 2 years, 6 months">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="petSpecialNotes">Special Care / Temperament Notes</label>
+          <textarea id="petSpecialNotes" class="form-textarea" rows="2"
+            placeholder="e.g. Friendly, nervous with water, sensitive ears"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+          <button type="button" class="btn btn-outline" id="cancelAddPetModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="savePetBtn">Save Pet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>© 2026 Pawfect Glow Pet Grooming Studio. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+
+</html>

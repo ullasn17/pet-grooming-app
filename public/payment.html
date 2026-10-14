@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Simulator - Pawfect Glow Pet Grooming</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/auth.js"></script>
+  <style>
+    .payment-layout {
+      min-height: calc(100vh - 140px);
+      padding: 40px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .payment-container {
+      max-width: 840px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 28px;
+    }
+    @media (max-width: 768px) {
+      .payment-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    .sandbox-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .order-summary-card {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .order-details-list {
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+    }
+    .order-row.highlight {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+    .order-row.total {
+      border-top: 2px dashed var(--color-border);
+      padding-top: 14px;
+      margin-top: 6px;
+      font-size: 1.25rem;
+      color: var(--color-primary);
+      font-weight: 800;
+    }
+    .checkout-card {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+    .payment-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--color-surface);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 22px;
+    }
+    .payment-tab {
+      flex: 1;
+      padding: 9px 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: all 0.2s;
+    }
+    .payment-tab.active {
+      background: #ffffff;
+      color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .virtual-card-preview {
+      background: linear-gradient(135deg, #1c3d31 0%, #295746 50%, #0d281e 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px -5px rgba(28, 61, 49, 0.35);
+      position: relative;
+    }
+    .card-chip {
+      width: 38px;
+      height: 28px;
+      background: linear-gradient(135deg, #e2b755, #ffd97d);
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    .card-number-display {
+      font-family: monospace;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+    .card-meta-display {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.85;
+    }
+    .processing-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .payment-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(28, 61, 49, 0.15);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 18px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon">🐾</div>
+        <span>Pawfect<span class="accent">Glow</span></span>
+      </a>
+      <div class="nav-actions">
+        <a href="/dashboard.html" class="btn btn-outline btn-sm">← Back to Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="payment-layout">
+    <div class="payment-container">
+
+      <!-- Left: Appointment Order Summary -->
+      <section class="order-summary-card">
+        <div>
+          <span class="sandbox-tag">🧪 Test Mode Gateway</span>
+          <h2 style="font-size: 1.4rem; color: var(--color-primary); margin-bottom: 4px;">Booking Summary</h2>
+          <p style="color: var(--color-text-muted); font-size: 0.85rem;">Review your pet's appointment details before authorizing payment.</p>
+
+          <div class="order-details-list" id="summaryList">
+            <div class="order-row">
+              <span>Status</span>
+              <span id="summaryStatus" class="badge badge-pending">Pending Payment</span>
+            </div>
+            <div class="order-row highlight">
+              <span>Pet Name</span>
+              <span id="summaryPetName">Loading...</span>
+            </div>
+            <div class="order-row">
+              <span>Grooming Service</span>
+              <span id="summaryService">Loading...</span>
+            </div>
+            <div class="order-row">
+              <span>Date</span>
+              <span id="summaryDate">Loading...</span>
+            </div>
+            <div class="order-row">
+              <span>Time Slot</span>
+              <span id="summaryTimeSlot">Loading...</span>
+            </div>
+            <div class="order-row">
+              <span>Base Package Fee</span>
+              <span id="summaryBasePrice">$45.00</span>
+            </div>
+            <div class="order-row">
+              <span>Booking & Spa Fee</span>
+              <span style="color: #059669; font-weight: 600;">FREE ($0)</span>
+            </div>
+            <div class="order-row total">
+              <span>Total Due</span>
+              <span id="summaryTotal">$45.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: rgba(28, 61, 49, 0.04); border-radius: var(--radius-md); padding: 14px; font-size: 0.82rem; color: var(--color-text-muted);">
+          ℹ️ <strong>Workflow Notice:</strong> After payment is processed, the appointment status will remain <strong>Pending</strong> until Salon Admin (<strong>Sanjay</strong>) reviews and <strong>Accepts</strong> or <strong>Rejects</strong> it.
+        </div>
+      </section>
+
+      <!-- Right: Interactive Dummy Payment Checkout -->
+      <section class="checkout-card">
+        <!-- Processing Overlay Screen -->
+        <div id="processingOverlay" class="processing-overlay">
+          <div class="payment-spinner" id="processingSpinner"></div>
+          <div style="font-size: 3rem; display: none;" id="processingCheck">✅</div>
+          <h3 id="processingTitle" style="font-size: 1.3rem; margin-bottom: 8px; color: var(--color-primary);">Processing Payment...</h3>
+          <p id="processingDesc" style="color: var(--color-text-muted); font-size: 0.9rem; max-width: 320px;">
+            Simulating bank verification and locking appointment slot in sandbox mode.
+          </p>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 1.25rem; color: var(--color-primary); margin: 0;">Dummy Payment Gateway</h3>
+          <span style="font-size: 0.75rem; color: #059669; background: #ecfdf5; padding: 4px 8px; border-radius: var(--radius-full); font-weight: 700;">● Sandbox Active</span>
+        </div>
+
+        <!-- Payment Mode Tabs -->
+        <div class="payment-tabs">
+          <button type="button" class="payment-tab active" onclick="switchTab('card')">💳 Test Card</button>
+          <button type="button" class="payment-tab" onclick="switchTab('upi')">📱 Dummy UPI</button>
+          <button type="button" class="payment-tab" onclick="switchTab('instant')">⚡ 1-Click Pay</button>
+        </div>
+
+        <!-- Tab 1: Mock Card Form -->
+        <div id="cardPaymentTab">
+          <div class="virtual-card-preview">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="card-chip"></div>
+              <span style="font-weight: 700; font-size: 0.9rem; letter-spacing: 1px;">PAWFECT PAY</span>
+            </div>
+            <div class="card-number-display" id="cardPreviewNumber">4242 •••• •••• 4242</div>
+            <div class="card-meta-display">
+              <div>
+                <span style="display: block; font-size: 0.65rem; opacity: 0.7;">CARD HOLDER</span>
+                <span id="cardPreviewName">PET PARENT</span>
+              </div>
+              <div>
+                <span style="display: block; font-size: 0.65rem; opacity: 0.7;">EXPIRES</span>
+                <span id="cardPreviewExp">12/28</span>
+              </div>
+            </div>
+          </div>
+
+          <form id="dummyCardForm">
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" style="font-size: 0.85rem;">Card Number</label>
+              <input type="text" id="cardNumberInput" class="form-input" value="4242 4242 4242 4242" placeholder="4242 4242 4242 4242" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" style="font-size: 0.85rem;">Expiry Date</label>
+                <input type="text" id="cardExpiryInput" class="form-input" value="12/28" placeholder="MM/YY" required>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" style="font-size: 0.85rem;">CVV / CVC</label>
+                <input type="password" id="cardCvvInput" class="form-input" value="888" maxlength="3" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+              <label class="form-label" style="font-size: 0.85rem;">Name on Card</label>
+              <input type="text" id="cardNameInput" class="form-input" value="Pet Parent" placeholder="Full Name" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 13px; font-weight: 700; font-size: 1rem;">
+              Pay <span id="payBtnAmount">$45.00</span> (Dummy Mode) 🐾
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab 2: Mock UPI -->
+        <div id="upiPaymentTab" style="display: none; text-align: center; padding: 20px 10px;">
+          <div style="background: var(--color-surface); padding: 18px; border-radius: var(--radius-lg); display: inline-block; margin-bottom: 16px; border: 1px dashed var(--color-border);">
+            <div style="font-size: 5rem; line-height: 1;">📱</div>
+            <div style="font-family: monospace; font-weight: 700; margin-top: 8px; color: var(--color-primary);">
+              pawfectglow@upi
+            </div>
+          </div>
+          <p style="color: var(--color-text-muted); font-size: 0.88rem; margin-bottom: 18px;">
+            Simulate a dummy instant UPI payment from Google Pay, PhonePe, or Paytm.
+          </p>
+          <button type="button" onclick="executeDummyPayment('UPI Simulator')" class="btn btn-primary btn-block" style="padding: 13px; font-weight: 700;">
+            Approve Simulated UPI Payment ⚡
+          </button>
+        </div>
+
+        <!-- Tab 3: 1-Click Fast Dummy Pay -->
+        <div id="instantPaymentTab" style="display: none; padding: 20px 0;">
+          <div style="padding: 20px; background: rgba(5, 150, 105, 0.08); border: 1px solid rgba(5, 150, 105, 0.2); border-radius: var(--radius-lg); margin-bottom: 20px;">
+            <h4 style="color: #065f46; margin-bottom: 6px;">⚡ Fast Developer Sandbox</h4>
+            <p style="font-size: 0.85rem; color: #047857; margin: 0;">
+              Instantly bypass card inputs and authorize dummy payment in one click.
+            </p>
+          </div>
+          <button type="button" onclick="executeDummyPayment('One-Click Sandbox')" class="btn btn-accent btn-block" style="padding: 14px; font-weight: 700;">
+            Authorize Instant Dummy Payment 🐾
+          </button>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    let currentAppointment = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const appointmentId = urlParams.get('appointmentId');
+
+    function switchTab(tab) {
+      document.querySelectorAll('.payment-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('cardPaymentTab').style.display = 'none';
+      document.getElementById('upiPaymentTab').style.display = 'none';
+      document.getElementById('instantPaymentTab').style.display = 'none';
+
+      if (tab === 'card') {
+        document.querySelectorAll('.payment-tab')[0].classList.add('active');
+        document.getElementById('cardPaymentTab').style.display = 'block';
+      } else if (tab === 'upi') {
+        document.querySelectorAll('.payment-tab')[1].classList.add('active');
+        document.getElementById('upiPaymentTab').style.display = 'block';
+      } else if (tab === 'instant') {
+        document.querySelectorAll('.payment-tab')[2].classList.add('active');
+        document.getElementById('instantPaymentTab').style.display = 'block';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await requireAuth();
+      if (!user) return;
+
+      if (user.name) {
+        document.getElementById('cardNameInput').value = user.name;
+        document.getElementById('cardPreviewName').textContent = user.name.toUpperCase();
+      }
+
+      if (!appointmentId) {
+        showToast('No appointment ID found. Redirecting to dashboard...', 'error');
+        setTimeout(() => window.location.replace('/dashboard.html'), 1500);
+        return;
+      }
+
+      await loadAppointmentDetails(appointmentId);
+
+      // Card input sync to preview
+      document.getElementById('cardNameInput').addEventListener('input', (e) => {
+        document.getElementById('cardPreviewName').textContent = (e.target.value || 'PET PARENT').toUpperCase();
+      });
+      document.getElementById('cardNumberInput').addEventListener('input', (e) => {
+        const val = e.target.value.replace(/\s+/g, '');
+        const masked = val ? val.replace(/(\d{4})/g, '$1 ').trim() : '4242 •••• •••• 4242';
+        document.getElementById('cardPreviewNumber').textContent = masked;
+      });
+      document.getElementById('cardExpiryInput').addEventListener('input', (e) => {
+        document.getElementById('cardPreviewExp').textContent = e.target.value || '12/28';
+      });
+
+      // Card Form submission
+      document.getElementById('dummyCardForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        executeDummyPayment('Mock Card ending 4242');
+      });
+    });
+
+    async function loadAppointmentDetails(id) {
+      try {
+        const res = await authFetch(`/api/appointments/${id}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.success || !data.appointment) {
+          showToast(data.message || 'Could not find appointment.', 'error');
+          setTimeout(() => window.location.replace('/dashboard.html'), 1500);
+          return;
+        }
+
+        currentAppointment = data.appointment;
+
+        // Populate summary
+        document.getElementById('summaryPetName').textContent = currentAppointment.petName;
+        document.getElementById('summaryService').textContent = currentAppointment.service;
+        document.getElementById('summaryDate').textContent = currentAppointment.date;
+        document.getElementById('summaryTimeSlot').textContent = currentAppointment.timeSlot;
+        
+        const priceStr = `$${currentAppointment.price || 45}.00`;
+        document.getElementById('summaryBasePrice').textContent = priceStr;
+        document.getElementById('summaryTotal').textContent = priceStr;
+        document.getElementById('payBtnAmount').textContent = priceStr;
+
+        if (currentAppointment.paymentStatus === 'Paid') {
+          document.getElementById('summaryStatus').className = 'badge badge-paid';
+          document.getElementById('summaryStatus').textContent = '✓ Already Paid';
+          showToast('This appointment is already paid! Status is ' + currentAppointment.status, 'info');
+          setTimeout(() => window.location.replace('/dashboard.html'), 2000);
+        }
+      } catch (err) {
+        console.error('Failed to load appointment:', err);
+        showToast('Error loading booking data.', 'error');
+      }
+    }
+
+    async function executeDummyPayment(methodName) {
+      if (!currentAppointment) return;
+
+      const overlay = document.getElementById('processingOverlay');
+      const spinner = document.getElementById('processingSpinner');
+      const check = document.getElementById('processingCheck');
+      const title = document.getElementById('processingTitle');
+      const desc = document.getElementById('processingDesc');
+
+      overlay.style.display = 'flex';
+      spinner.style.display = 'block';
+      check.style.display = 'none';
+      title.textContent = 'Processing Payment...';
+      desc.textContent = `Authorizing simulated charge via ${methodName}. Please wait...`;
+
+      try {
+        // Simulated network delay for realistic gateway animation
+        await new Promise(r => setTimeout(r, 1400));
+
+        const res = await authFetch(`/api/appointments/${currentAppointment._id}/dummy-pay`, {
+          method: 'POST'
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          spinner.style.display = 'none';
+          check.style.display = 'block';
+          title.textContent = 'Payment Authorized! 🎉';
+          desc.innerHTML = `
+            <strong>$${currentAppointment.price || 45}.00</strong> successfully charged in Dummy Mode.<br><br>
+            Appointment status is now <strong>⏳ Pending</strong> until Salon Admin (<strong>Sanjay</strong>) reviews and confirms.
+          `;
+          showToast('Payment successful! Status is Pending approval.', 'success');
+
+          setTimeout(() => {
+            window.location.replace('/dashboard.html');
+          }, 2200);
+        } else {
+          overlay.style.display = 'none';
+          showToast(data.message || 'Payment simulation failed.', 'error');
+        }
+      } catch (err) {
+        console.error('Payment simulation error:', err);
+        overlay.style.display = 'none';
+        showToast('Network error during payment simulation.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

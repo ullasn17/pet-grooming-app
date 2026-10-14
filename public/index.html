@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pawfect Glow - Premium Pet Grooming Studio</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- Clerk JavaScript SDK -->
+  <script 
+    async 
+    crossorigin="anonymous" 
+    data-clerk-publishable-key="pk_test_c3RpbGwtc3dhbi05NTc0LmNsZXJrLmFjY291bnRzLmRldiQ" 
+    src="https://still-swan-9574.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js" 
+    type="text/javascript"
+  ></script>
+  <script src="/js/auth.js"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand-logo">
+        <div class="logo-icon">🐾</div>
+        <span>Pawfect<span class="accent">Glow</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#services" class="nav-link">Services</a></li>
+        <li><a href="#about" class="nav-link">Why Us</a></li>
+        <li><a href="#pricing" class="nav-link">Pricing</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div id="navActions" class="nav-actions">
+        <a href="/login.html" class="btn btn-outline btn-sm">Log In</a>
+        <a href="/signup.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container">
+      <div class="hero-pill">
+        <span>✨</span> Voted #1 Pet Spa & Grooming Experience
+      </div>
+
+      <h1 class="hero-title">
+        Gentle, Stress-Free Care for Your <span class="highlight">Furry Best Friends</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        From soothing botanical hydro-baths to bespoke breed stylings, we provide a relaxing sanctuary tailored to your pet's comfort and happiness.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="/dashboard.html" class="btn btn-primary" id="heroCtaBtn">
+          Book Grooming Session 🐾
+        </a>
+        <a href="#services" class="btn btn-outline">
+          Explore Services
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <h3>4,800+</h3>
+          <p>Happy Pets Groomed</p>
+        </div>
+        <div class="stat-item">
+          <h3>100%</h3>
+          <p>Organic & Gentle Products</p>
+        </div>
+        <div class="stat-item">
+          <h3>4.9 ★</h3>
+          <p>Google Customer Rating</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Services Section -->
+  <section class="section" id="services">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Signature Treatments</span>
+        <h2 class="section-title">Designed for Comfort & Radiance</h2>
+        <p>Every pet receives gentle 1-on-1 attention with allergen-safe botanical formulas.</p>
+      </div>
+
+      <div class="services-grid" id="servicesGrid">
+        <!-- Service Card 1 -->
+        <div class="service-card">
+          <div>
+            <div class="service-top">
+              <div class="service-icon-box">✂️</div>
+              <span class="service-badge">Full Spa</span>
+            </div>
+            <h3>Royal Full Grooming</h3>
+            <p>Nourishing bath, custom breed haircut, styling, ear cleaning, paw pad balm, and nail clipping.</p>
+          </div>
+          <div class="service-footer">
+            <div>
+              <span class="service-price">$75</span>
+              <span class="service-duration">90 mins session</span>
+            </div>
+            <a href="/dashboard.html" class="btn btn-primary btn-sm">Book</a>
+          </div>
+        </div>
+
+        <!-- Service Card 2 -->
+        <div class="service-card">
+          <div>
+            <div class="service-top">
+              <div class="service-icon-box">🛁</div>
+              <span class="service-badge">Essential</span>
+            </div>
+            <h3>Signature Bath & Brush</h3>
+            <p>Deep botanical hydro-bath, blow out, full coat brush out, nail trim, and organic spritz.</p>
+          </div>
+          <div class="service-footer">
+            <div>
+              <span class="service-price">$45</span>
+              <span class="service-duration">45 mins session</span>
+            </div>
+            <a href="/dashboard.html" class="btn btn-primary btn-sm">Book</a>
+          </div>
+        </div>
+
+        <!-- Service Card 3 -->
+        <div class="service-card">
+          <div>
+            <div class="service-top">
+              <div class="service-icon-box">✨</div>
+              <span class="service-badge">Specialty</span>
+            </div>
+            <h3>De-Shedding Treatment</h3>
+            <p>Undercoat blowout, specialized furminator rake, anti-shed shampoo, and gloss shine treatment.</p>
+          </div>
+          <div class="service-footer">
+            <div>
+              <span class="service-price">$60</span>
+              <span class="service-duration">60 mins session</span>
+            </div>
+            <a href="/dashboard.html" class="btn btn-primary btn-sm">Book</a>
+          </div>
+        </div>
+
+        <!-- Service Card 4 -->
+        <div class="service-card">
+          <div>
+            <div class="service-top">
+              <div class="service-icon-box">🐾</div>
+              <span class="service-badge">Gentle Intro</span>
+            </div>
+            <h3>Puppy & Kitten First Spa</h3>
+            <p>Gentle positive-reinforcement bath, sanitary trim, nail buffing, and warm soothing cuddle session.</p>
+          </div>
+          <div class="service-footer">
+            <div>
+              <span class="service-price">$35</span>
+              <span class="service-duration">35 mins session</span>
+            </div>
+            <a href="/dashboard.html" class="btn btn-primary btn-sm">Book</a>
+          </div>
+        </div>
+
+        <!-- Service Card 5 -->
+        <div class="service-card">
+          <div>
+            <div class="service-top">
+              <div class="service-icon-box">🦷</div>
+              <span class="service-badge">Dental</span>
+            </div>
+            <h3>Dental & Breath Refresh</h3>
+            <p>Ultrasonic enzymatic toothbrushing, gum massaging gel, and fresh minty breath spray.</p>
+          </div>
+          <div class="service-footer">
+            <div>
+              <span class="service-price">$22</span>
+              <span class="service-duration">20 mins session</span>
+            </div>
+            <a href="/dashboard.html" class="btn btn-primary btn-sm">Book</a>
+          </div>
+        </div>
+
+        <!-- Service Card 6 -->
+        <div class="service-card">
+          <div>
+            <div class="service-top">
+              <div class="service-icon-box">🐾</div>
+              <span class="service-badge">Hygiene</span>
+            </div>
+            <h3>Nail File & Paw Rescue</h3>
+            <p>Precision nail clipping and electric buffing with an organic shea butter paw wax treatment.</p>
+          </div>
+          <div class="service-footer">
+            <div>
+              <span class="service-price">$18</span>
+              <span class="service-duration">20 mins session</span>
+            </div>
+            <a href="/dashboard.html" class="btn btn-primary btn-sm">Book</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="section" id="about" style="background: var(--color-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">The Pawfect Difference</span>
+        <h2 class="section-title">Why Pet Parents Trust Us</h2>
+        <p>We treat every pet like family in a serene, kennel-free environment.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+        <div style="background: var(--color-bg); padding: 30px; border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🌿</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 8px;">100% Organic Products</h3>
+          <p>Hypoallergenic, sulfate-free shampoos formulated with soothing aloe and oatmeal.</p>
+        </div>
+
+        <div style="background: var(--color-bg); padding: 30px; border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+          <div style="font-size: 2rem; margin-bottom: 12px;">❤️</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Fear-Free Certified</h3>
+          <p>Trained in low-stress handling techniques to ensure anxious pets feel completely secure.</p>
+        </div>
+
+        <div style="background: var(--color-bg); padding: 30px; border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+          <div style="font-size: 2rem; margin-bottom: 12px;">📱</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Easy Online Booking</h3>
+          <p>Manage your pet profiles, book appointments, and track your grooming history in your client portal.</p>
+        </div>
+
+        <div style="background: var(--color-bg); padding: 30px; border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+          <div style="font-size: 2rem; margin-bottom: 12px;">🏆</div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Master Stylists</h3>
+          <p>Over a decade of combined breed-specific scissor styling and coat maintenance expertise.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div style="background: linear-gradient(135deg, var(--color-primary) 0%, #152d24 100%); color: white; border-radius: var(--radius-xl); padding: 60px 40px; text-align: center; box-shadow: var(--shadow-lg);">
+        <h2 style="color: white; font-size: 2.4rem; margin-bottom: 16px;">Ready for Your Pet's VIP Spa Day?</h2>
+        <p style="color: rgba(255, 255, 255, 0.85); font-size: 1.15rem; max-width: 580px; margin: 0 auto 32px;">
+          Create your account today, add your furry companion, and easily schedule your first appointment online!
+        </p>
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+          <a href="/signup.html" class="btn btn-accent" style="font-size: 1.05rem; padding: 14px 30px;">
+            Create Free Account 🐾
+          </a>
+          <a href="/login.html" class="btn btn-outline" style="color: white; border-color: rgba(255, 255, 255, 0.3);">
+            Client Sign In
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="container footer-content">
+      <div class="brand-logo">
+        <div class="logo-icon">🐾</div>
+        <span>Pawfect<span class="accent">Glow</span></span>
+      </div>
+      <p style="max-width: 460px;">
+        Premium Pet Grooming & Wellness Studio. Dedicated to keeping your pets looking radiant and feeling happy.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--color-text-light);">
+        📍 104 Pet Care Boulevard, Suite 200 &nbsp;|&nbsp; 📞 (555) 349-PAWS &nbsp;|&nbsp; ✉️ hello@pawfectglow.com
+      </p>
+      <p style="font-size: 0.8rem; margin-top: 10px;">
+        © 2026 Pawfect Glow Pet Grooming Studio. Powered by Node.js & MongoDB.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
