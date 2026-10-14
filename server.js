@@ -17,10 +17,21 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'pet_grooming_secret_jwt_key_2026';
-const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb+srv://gd6183514_db_user:fQBYJ5bb6lscouvj@login.7dppwwl.mongodb.net/pet_grooming?retryWrites=true&w=majority';
-const CLERK_PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY || 'pk_test_c3RpbGwtc3dhbi05NTc0LmNsZXJrLmFjY291bnRzLmRldiQ';
-const CLERK_FRONTEND_API = process.env.CLERK_FRONTEND_API || 'still-swan-9574.clerk.accounts.dev';
+const JWT_SECRET = process.env.JWT_SECRET;
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
+const CLERK_PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY || '';
+const CLERK_FRONTEND_API = process.env.CLERK_FRONTEND_API || '';
+
+// Validate mandatory environment variables
+if (!MONGO_URI) {
+  console.error('❌ FATAL ERROR: MONGODB_URI (or MONGO_URI) is required in environment variables (.env).');
+  process.exit(1);
+}
+
+if (!JWT_SECRET) {
+  console.error('❌ FATAL ERROR: JWT_SECRET is required in environment variables (.env).');
+  process.exit(1);
+}
 
 // Middlewares
 app.use(cors());
@@ -48,15 +59,20 @@ app.get('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'signup.html'));
 });
 
-// Clerk JWKS client for verifying RS256 session tokens
-const clerkJwks = jwksClient({
-  jwksUri: `https://${CLERK_FRONTEND_API}/.well-known/jwks.json`,
-  cache: true,
-  cacheMaxEntries: 5,
-  cacheMaxAge: 600000 // 10 mins
-});
+// Clerk JWKS client for verifying RS256 session tokens (only if configured)
+const clerkJwks = CLERK_FRONTEND_API
+  ? jwksClient({
+      jwksUri: `https://${CLERK_FRONTEND_API}/.well-known/jwks.json`,
+      cache: true,
+      cacheMaxEntries: 5,
+      cacheMaxAge: 600000 // 10 mins
+    })
+  : null;
 
 function getClerkKey(header, callback) {
+  if (!clerkJwks) {
+    return callback(new Error('Clerk authentication is not configured.'));
+  }
   clerkJwks.getSigningKey(header.kid, function (err, key) {
     if (err) return callback(err);
     const signingKey = key.getPublicKey();
@@ -101,28 +117,34 @@ const User = mongoose.model('User', userSchema);
 const Pet = mongoose.model('Pet', petSchema);
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-// --- SEED ADMIN ACCOUNT (Sanjay - PetAdmin@gmail.com) ---
+// --- SEED ADMIN ACCOUNT ---
 async function seedAdminUser() {
   try {
-    const adminEmail = 'petadmin@gmail.com';
-    const adminPass = 'PetAdmin@123';
-    const adminName = 'Sanjay';
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPass = process.env.ADMIN_PASSWORD;
+    const adminName = process.env.ADMIN_NAME || 'Admin';
 
-    let admin = await User.findOne({ email: adminEmail });
+    if (!adminEmail || !adminPass) {
+      console.log('ℹ️ ADMIN_EMAIL or ADMIN_PASSWORD not specified in .env. Skipping admin auto-seeding.');
+      return;
+    }
+
+    const cleanEmail = adminEmail.toLowerCase().trim();
+    let admin = await User.findOne({ email: cleanEmail });
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(adminPass, salt);
 
     if (!admin) {
       admin = new User({
         name: adminName,
-        email: adminEmail,
+        email: cleanEmail,
         password: hashedPassword,
         role: 'admin'
       });
       await admin.save();
-      console.log('🛡️ Admin user seeded successfully: PetAdmin@gmail.com (Sanjay)');
+      console.log(`🛡️ Admin user seeded successfully: ${cleanEmail} (${adminName})`);
     } else {
-      // Ensure role is admin, name is Sanjay, and password is set correctly
+      // Ensure role is admin, name is configured, and password matches
       let changed = false;
       if (admin.role !== 'admin') { admin.role = 'admin'; changed = true; }
       if (admin.name !== adminName) { admin.name = adminName; changed = true; }
@@ -133,9 +155,9 @@ async function seedAdminUser() {
       }
       if (changed) {
         await admin.save();
-        console.log('🛡️ Admin user updated successfully: PetAdmin@gmail.com (Sanjay)');
+        console.log(`🛡️ Admin user updated successfully: ${cleanEmail} (${adminName})`);
       } else {
-        console.log('🛡️ Admin user verified: PetAdmin@gmail.com (Sanjay)');
+        console.log(`🛡️ Admin user verified: ${cleanEmail} (${adminName})`);
       }
     }
   } catch (err) {
@@ -613,12 +635,12 @@ app.post('/api/appointments/:id/dummy-pay', authMiddleware, async (req, res) => 
     }
 
     appointment.paymentStatus = 'Paid';
-    appointment.status = 'Pending'; // Status displays pending until Sanjay (Admin) accepts or rejects
+    appointment.status = 'Pending'; // Status displays pending until Admin reviews
     await appointment.save();
 
     return res.json({
       success: true,
-      message: 'Dummy payment authorized! Status is Pending until salon admin (Sanjay) accepts.',
+      message: 'Dummy payment authorized! Status is Pending until salon admin reviews and accepts.',
       appointment
     });
   } catch (error) {
@@ -646,7 +668,7 @@ app.patch('/api/appointments/:id/cancel', authMiddleware, async (req, res) => {
   }
 });
 
-// --- ADMIN API ROUTES (Sanjay - PetAdmin@gmail.com) ---
+// --- ADMIN API ROUTES ---
 
 // Get all appointments across all users
 app.get('/api/admin/appointments', adminMiddleware, async (req, res) => {
@@ -723,6 +745,8 @@ app.get('/api/admin/stats', adminMiddleware, async (req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`🐾 Pet Grooming Server running at http://localhost:${PORT}`);
-  console.log(`🔑 Clerk Auth enabled with Publishable Key: ${CLERK_PUBLISHABLE_KEY.substring(0, 12)}...`);
+  if (CLERK_PUBLISHABLE_KEY) {
+    console.log(`🔑 Clerk Auth enabled with Publishable Key: ${CLERK_PUBLISHABLE_KEY.substring(0, 12)}...`);
+  }
   console.log(`🛡️ Admin Portal available at http://localhost:${PORT}/admin`);
 });

@@ -8,14 +8,16 @@
  * 5. Book appointment -> Initial status 'Pending', paymentStatus 'Unpaid'
  * 6. Process Dummy Payment Simulator -> paymentStatus 'Paid', status 'Pending'
  * 7. Non-admin access to admin routes -> 403 Forbidden
- * 8. Admin login with PetAdmin@gmail.com & PetAdmin@123 -> Sanjay (role: 'admin')
+ * 8. Admin login using configured environment credentials
  * 9. Admin view incoming appointments
  * 10. Admin accept appointment -> status 'Confirmed'
  * 11. Admin reject appointment -> status 'Rejected'
  * 12. Admin stats endpoint
  */
 
-const BASE_URL = 'http://localhost:3000';
+require('dotenv').config();
+
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 async function runTests() {
   console.log('--- STARTING FULLSTACK & ADMIN E2E VERIFICATION ---');
@@ -145,21 +147,28 @@ async function runTests() {
   }
   console.log(` Security verified: Regular user blocked from admin routes (403 Forbidden)`);
 
-  // 8. Admin Login with PetAdmin@gmail.com / PetAdmin@123
-  const adminLoginRes = await fetch(`${BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'PetAdmin@gmail.com', password: 'PetAdmin@123' })
-  });
-  const adminLoginData = await adminLoginRes.json();
-  if (!adminLoginRes.ok || !adminLoginData.token) {
-    throw new Error(`Admin login failed: ${JSON.stringify(adminLoginData)}`);
+  // 8. Admin Login with configured credentials
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (adminEmail && adminPassword) {
+    const adminLoginRes = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: adminEmail, password: adminPassword })
+    });
+    const adminLoginData = await adminLoginRes.json();
+    if (!adminLoginRes.ok || !adminLoginData.token) {
+      throw new Error(`Admin login failed: ${JSON.stringify(adminLoginData)}`);
+    }
+    if (adminLoginData.user.role !== 'admin') {
+      throw new Error(`Expected user with role 'admin', got: ${JSON.stringify(adminLoginData.user)}`);
+    }
+    adminToken = adminLoginData.token;
+    console.log(` Admin authentication verified: Name="${adminLoginData.user.name}", Role="${adminLoginData.user.role}"`);
+  } else {
+    console.log(` ℹ️ ADMIN_EMAIL or ADMIN_PASSWORD not configured; skipping admin auth check.`);
   }
-  if (adminLoginData.user.name !== 'Sanjay' || adminLoginData.user.role !== 'admin') {
-    throw new Error(`Expected Admin Sanjay with role 'admin', got: ${JSON.stringify(adminLoginData.user)}`);
-  }
-  adminToken = adminLoginData.token;
-  console.log(` Admin authentication verified: Name="${adminLoginData.user.name}", Role="${adminLoginData.user.role}"`);
 
   // 9. Admin view all incoming appointments
   const adminApptsRes = await fetch(`${BASE_URL}/api/admin/appointments`, {
@@ -211,7 +220,7 @@ async function runTests() {
   }
   console.log(` Admin stats verified: Total=${statsData.stats.totalBookings}, Confirmed=${statsData.stats.confirmedCount}, Rejected=${statsData.stats.rejectedCount}, Revenue=$${statsData.stats.totalRevenue}`);
 
-  console.log('\n🎉 ALL FULLSTACK, DUMMY PAYMENT, ADMIN (SANJAY), ACCEPT & REJECT TESTS PASSED PERFECTLY!');
+  console.log('\n🎉 ALL FULLSTACK, DUMMY PAYMENT, ADMIN, ACCEPT & REJECT TESTS PASSED PERFECTLY!');
 }
 
 runTests().catch(err => {

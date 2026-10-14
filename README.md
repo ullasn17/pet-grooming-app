@@ -17,7 +17,7 @@ A modern, fullstack web application for pet grooming salon management, appointme
 
 ### 🛡️ Admin Dashboard (`/admin`)
 - **Protected Access**: Role-based access control (RBAC) ensuring only administrative users can access admin API routes and views.
-- **Pre-seeded Admin**: Ready-to-use admin profile (`petadmin@gmail.com` / `PetAdmin@123`).
+- **Configurable Administrator**: Auto-seeded or verified via secure environment variables (`ADMIN_EMAIL` and `ADMIN_PASSWORD`).
 - **Business Analytics**: High-level overview of total bookings, pending approvals, confirmed appointments, and total revenue.
 - **Booking Management**: Accept or reject incoming customer bookings with real-time status updates.
 
@@ -91,6 +91,11 @@ PORT=3000
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/pet_grooming?retryWrites=true&w=majority
 JWT_SECRET=your_jwt_secret_key_here
 
+# Administrator Credentials
+ADMIN_NAME=Admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_secure_admin_password_here
+
 # Optional: Clerk SSO
 CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key
 CLERK_FRONTEND_API=your-app.clerk.accounts.dev
@@ -117,11 +122,14 @@ Once running, visit:
 
 ---
 
-## 🔑 Default Admin Credentials
+## 🔑 Administrator Configuration
 
-When the server starts up, an administrative account is automatically seeded:
-- **Email**: `petadmin@gmail.com`
-- **Password**: `PetAdmin@123`
+Administrative credentials are configured securely via your local `.env` file:
+- `ADMIN_NAME`: Display name for the salon admin (e.g., `Salon Manager`).
+- `ADMIN_EMAIL`: Administrator login email address.
+- `ADMIN_PASSWORD`: Administrator password.
+
+When the server starts, it automatically creates or syncs the administrator user according to these environment variables.
 
 ---
 

@@ -104,17 +104,6 @@
         </button>
       </form>
 
-      <!-- Admin Quick-Fill Banner -->
-      <div style="margin-top: 18px; padding: 12px 14px; background: rgba(28, 61, 49, 0.04); border: 1px dashed rgba(28, 61, 49, 0.25); border-radius: var(--radius-md); font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-        <div>
-          <span style="font-weight: 700; color: var(--color-primary);">🛡️ Salon Admin (Sanjay):</span>
-          <div style="color: var(--color-text-muted); font-size: 0.8rem;">PetAdmin@gmail.com</div>
-        </div>
-        <button type="button" id="fillAdminBtn" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 4px 10px; background: white;">
-          Quick Fill
-        </button>
-      </div>
-
       <div class="auth-footer">
         New pet parent? <a href="/signup.html">Create an account here</a>
       </div>
@@ -139,16 +128,6 @@
         }
       }
     } catch (_) {}
-
-    // Admin Quick-Fill Click Handler
-    const fillAdminBtn = document.getElementById('fillAdminBtn');
-    if (fillAdminBtn) {
-      fillAdminBtn.addEventListener('click', () => {
-        document.getElementById('email').value = 'PetAdmin@gmail.com';
-        document.getElementById('password').value = 'PetAdmin@123';
-        showToast('Admin credentials filled: PetAdmin@gmail.com', 'info');
-      });
-    }
 
     // Google SSO Click Handler
     document.getElementById('googleSsoBtn').addEventListener('click', async () => {
@@ -195,7 +174,7 @@
 
           // Check if admin user
           if (data.user && data.user.role === 'admin') {
-            showToast('Welcome Administrator Sanjay! 🛡️', 'success');
+            showToast(`Welcome Administrator ${data.user.name || ''}! 🛡️`, 'success');
             setTimeout(() => {
               window.location.replace('/admin.html');
             }, 500);
