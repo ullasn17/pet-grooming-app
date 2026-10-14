@@ -20,7 +20,7 @@ A modern, fullstack web application for pet grooming salon management, appointme
 - **Configurable Administrator**: Auto-seeded or verified via secure environment variables (`ADMIN_EMAIL` and `ADMIN_PASSWORD`).
 - **Business Analytics**: High-level overview of total bookings, pending approvals, confirmed appointments, and total revenue.
 - **Booking Management**: Accept or reject incoming customer bookings with real-time status updates.
-
+- **For Admin login**: Create your own Admin email and Password in .env file and save.
 ---
 
 ## 🛠️ Tech Stack
